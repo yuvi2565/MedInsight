@@ -5,9 +5,9 @@ import './homepage.css';
 
 function MedicalForm() {
     const [formData, setFormData] = useState({
-        // name: "",
-        // email: "",
-        // gender: "",
+        name: "",
+        email: "",
+        gender: "",
         pregnancies: 3.845052,
         glucose: 120.894531,
         bloodPressure: 69.105469,
@@ -15,8 +15,8 @@ function MedicalForm() {
         insulin: 79.799479,
         bmi: 31.992578,
         dpf: 0.471876,
-        age: 33.240885
-        // file: null
+        age: 33.240885,
+        file: null
     });
 
     const handleInputChange = (e) => {
@@ -25,7 +25,7 @@ function MedicalForm() {
         let roundedValue = value;
 
         // Round numeric values to the nearest integer, excluding BMI field
-        if (name !== "bmi" && name!=="name" && name!=="email" && name!=="gender" && name!=="file" && !isNaN(value) && value !== "") {
+        if (name !== "bmi" && name !== "name" && name !== "email" && name !== "gender" && name !== "file" && !isNaN(value) && value !== "") {
             roundedValue = Math.round(parseFloat(value));
         }
 
@@ -33,7 +33,7 @@ function MedicalForm() {
             ...formData,
             [name]: roundedValue
         });
-        console.log(formData);
+        // console.log(formData);
     };
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -45,25 +45,44 @@ function MedicalForm() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        let my_data = 0
 
         try {
+            console.log('sending data');
+            console.log(formData);
             const response = await fetch("http://127.0.0.1:5000/", {
                 method: "POST",
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(formData),
-                headers: {
-                    "Content-Type": "application/json"
-                }
             });
+
             if (response.ok) {
-                // Handle success
-                console.log("Form data sent successfully");
+                const data = await response.json();
+                console.log("Received data from backend:", data);
+                // Display an alert with the received data
+                my_data=JSON.stringify(data)
+                my_data*=100
+                my_data=Math.floor(my_data)
+                if(my_data<=25) {
+                    alert("Percentage of you having diabetes is : " + my_data+ "% \n Maintain a healthy lifestyle by incorporating regular exercise and a balanced diet rich in fruits, vegetables, and whole grains. Schedule regular check-ups with your healthcare provider to monitor your health status and discuss any concerns or changes in symptoms.");
+                }
+                else if(my_data>25 && my_data<=50){
+                    alert("Percentage of you having diabetes is : " + my_data+ "% \n Increase awareness about diabetes symptoms and risk factors. Consider lifestyle modifications such as weight loss (if overweight), reducing sugar intake, and avoiding sedentary behaviors. Consult with a healthcare professional for personalized advice and screening tests.");
+                }
+                else if(my_data>50 && my_data<=75){
+                    alert("Percentage of you having diabetes is : " + my_data+ "% \n Take proactive steps to manage and reduce risk factors associated with diabetes, such as controlling blood sugar levels, maintaining a healthy weight, and managing stress.Monitor blood glucose levels regularly, especially if there's a family history of diabetes or other risk factors present.Discuss with a healthcare provider about starting preventive measures or medications to lower the risk of developing diabetes.");
+                }
+                else{
+                    alert("Percentage of you having diabetes is : " + my_data+ "% \n Prioritize comprehensive diabetes prevention strategies, including close monitoring of blood sugar levels, adherence to a diabetic-friendly diet, regular exercise, and weight management.Work closely with healthcare professionals, including endocrinologists, dietitians, and diabetes educators, to develop a personalized management plan.Consider genetic counseling to understand the hereditary risk factors and potential preventive measures.");
+                }
+                
             } else {
-                // Handle errors
                 console.error("Failed to send form data");
             }
         } catch (error) {
             console.error("Error sending form data:", error);
         }
+
     };
 
     return (
@@ -92,22 +111,22 @@ function MedicalForm() {
                     <label htmlFor="pregnancies">Pregnancies:</label>
                     <input type="number" id="pregnancies" name="pregnancies" onChange={handleInputChange} />
 
-                    <label htmlFor="glucose">Glucose:</label>
+                    <label htmlFor="glucose">Glucose level : (in mg/dL)</label>
                     <input type="number" step="0.01" id="glucose" name="glucose" onChange={handleInputChange} />
 
-                    <label htmlFor="bloodPressure">Blood Pressure:</label>
+                    <label htmlFor="bloodPressure">Blood Pressure: (in mm Hg)</label>
                     <input type="number" step="0.01" id="bloodPressure" name="bloodPressure" onChange={handleInputChange} />
 
-                    <label htmlFor="skinThickness">Skin Thickness:</label>
+                    <label htmlFor="skinThickness">Skin Thickness: (in mm)</label>
                     <input type="number" step="0.01" id="skinThickness" name="skinThickness" onChange={handleInputChange} />
 
-                    <label htmlFor="insulin">Insulin:</label>
+                    <label htmlFor="insulin">Insulin: (in IU/ml)</label>
                     <input type="number" step="0.01" id="insulin" name="insulin" onChange={handleInputChange} />
 
                     <label htmlFor="bmi">BMI:</label>
                     <input type="number" step="0.01" id="bmi" name="bmi" onChange={handleInputChange} />
 
-                    <label htmlFor="age">Age:</label>
+                    <label htmlFor="age">Age: (in years)</label>
                     <input type="number" id="age" name="age" required onChange={handleInputChange} />
 
                     <label htmlFor="file-upload">Upload Medical Report:</label>

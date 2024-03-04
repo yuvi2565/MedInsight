@@ -1,30 +1,39 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS,cross_origin
+import sklearn
 import joblib
 import pandas as pd
+import json
 
 app = Flask(__name__)
-CORS(app)
-import json
+CORS(app,origins= '*')
 @app.route('/', methods=["POST"])
 @cross_origin()
 def index():
     if request.method == "POST":
-        data = request.form
-        print("DATA RECEIVED SUCCESSFULLLY")
+        # print("scikit-learn version:", scikit_learn.__version__)
+        print(request.data)
+        data=request.data
         print(data)
-        Glucose = data.get("glucose")
-        print(type(Glucose))
-        Pregnancies=data.get("pregnancies")
-        BloodPressure=data.get( 'bloodPressure') 
-        SkinThickness=data.get( 'skinThickness') 
-        Insulin=data.get( 'insulin') 
-        BMI=data.get( 'bmi') 
-        print(type(BMI))
-        DiabetesPedigreeFunction=data.get( 'dpf') 
-        Age=data.get( 'age')
+        data_dict = json.loads(data)
 
-        data_list=[Pregnancies, Glucose, BloodPressure, SkinThickness, Insulin,BMI, DiabetesPedigreeFunction, Age]  
+        # Access object properties
+        name = data_dict['name']
+        email = data_dict['email']
+        gender = data_dict['gender']
+        pregnancies = data_dict['pregnancies']
+        glucose = data_dict['glucose']
+        bloodPressure = data_dict['bloodPressure']
+        skinThickness = data_dict['skinThickness']
+        insulin = data_dict['insulin']
+        bmi = data_dict['bmi']
+        dpf = data_dict['dpf']
+        age = data_dict['age']
+        file = data_dict['file']
+        print(name, email, gender, pregnancies, glucose, bloodPressure, skinThickness, insulin, bmi, dpf, age, file)
+        bmi=float(bmi)
+        data_list=[pregnancies, glucose, bloodPressure, skinThickness, insulin, bmi, dpf, age]
+        print(data_list)
         pipeline = joblib.load('diabetes.pkl')
         columns = ["Pregnancies", "Glucose", "BloodPressure", "SkinThickness", "Insulin", "BMI", "DiabetesPedigreeFunction", "Age"]
         df = pd.DataFrame([data_list], columns=columns)
@@ -32,7 +41,9 @@ def index():
         prediction = pipeline['model'].predict_proba(preprocessed_data)
         print(prediction)
 
-        return jsonify(prediction)
+        answer=prediction[0][1]
+
+        return jsonify(answer)
 
 if __name__ == "__main__":
     app.run(debug=True)
