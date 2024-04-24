@@ -85,7 +85,7 @@ function MedicalForm() {
 
     };
 
-    return (
+    return ( 
         <div>
             <Navbar />
             <div>
@@ -133,7 +133,7 @@ function MedicalForm() {
                     <input type="file" id="file-upload" name="file" accept=".pdf, .doc, .docx" onChange={handleFileChange} />
 
                     <div className="button-container">
-                        <button type="submit" style={{ backgroundColor: "rgb(87, 239, 165)" }}>Submit</button>
+                        <button type="submit" className="submitbutton"> SUBMIT</button>
                     </div>
                 </form>
             </div>
